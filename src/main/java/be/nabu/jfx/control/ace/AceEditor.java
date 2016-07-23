@@ -44,6 +44,8 @@ public class AceEditor {
 	private Map<String, String> modes = new HashMap<String, String>();
 	private boolean keyPressed = false;
 	
+	private Map<String, Object> options = new HashMap<String, Object>();
+	
 	public AceEditor() {
 		setKeyCombination(COPY, new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN));
 		setKeyCombination(PASTE, new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN));
@@ -70,6 +72,12 @@ public class AceEditor {
 		setMode("text/sql", "sql");
 		setMode("text/x-template", "html");
 	}
+	public void requestFocus() {
+		getWebView().requestFocus();
+		if (loaded) {
+			getWebView().getEngine().executeScript("editorFocus()");
+		}
+	}
 	public void setShowWhitespace(boolean showWhitespace) {
 		setOption("showInvisibles", showWhitespace);
 	}
@@ -85,8 +93,14 @@ public class AceEditor {
 	public void setSoftTabs(boolean softTabs) {
 		setOption("useSoftTabs", softTabs);
 	}
+	public void setReadOnly(boolean readOnly) {
+		setOption("readOnly", readOnly);
+	}
 	private void setOption(String key, Object value) {
-		webview.getEngine().executeScript("setOption('" + key + "', " + value + ")");
+		options.put(key, value);
+		if (loaded) {
+			getWebView().getEngine().executeScript("setOption('" + key + "', " + value + ")");
+		}
 	}
 	public void setMode(String contentType, String mode) {
 		modes.put(contentType, mode);
@@ -119,6 +133,13 @@ public class AceEditor {
 		return null;
 	}
 	
+	public void append(String content) {
+		if (loaded) {
+			JSObject window = (JSObject) getWebView().getEngine().executeScript("window");
+			window.call("pasteValue", content);
+		}
+	}
+	
 	public WebView getWebView() {
 		if (this.webview == null) {
 			synchronized(this) {
@@ -126,25 +147,41 @@ public class AceEditor {
 					webview = new WebView();
 					webview.getEngine().setJavaScriptEnabled(true);
 
-					webview.getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
-						@Override
-						public void changed(ObservableValue<? extends State> observable, State oldValue, State newValue) {
-							if (newValue == State.SUCCEEDED) {
-								loaded = true;
-								if (content != null) {
-									setContentInWebview(contentType, content);
-									contentType = null;
-									content = null;
-								}
-							}
-						}
-					});
 					// we provide external menu stuff, the internal ace menu doesn't work too well anyway because copy/paste etc is restricted within javascript
 					webview.setContextMenuEnabled(false);
 
 					String externalForm = AceEditor.class.getResource("/ace/editor.html").toExternalForm();
 					System.out.println("Found editor: " + externalForm);
 					webview.getEngine().load(externalForm);
+
+					webview.getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
+						@Override
+						public void changed(ObservableValue<? extends State> observable, State oldValue, State newValue) {
+							if (newValue == State.SUCCEEDED) {
+//								loaded = true;
+//								if (content != null) {
+//									setContentInWebview(contentType, content);
+//									contentType = null;
+//									content = null;
+//								}
+							}
+						}
+					});
+					
+					webview.getEngine().documentProperty().addListener(new ChangeListener<Document>() {
+						@Override
+						public void changed(ObservableValue<? extends Document> arg0, Document arg1, Document arg2) {
+							loaded = true;
+							if (content != null) {
+								setContentInWebview(contentType, content);
+								contentType = null;
+								content = null;
+								for (String key : options.keySet()) {
+									setOption(key, options.get(key));
+								}
+							}
+						}
+					});
 
 					webview.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
 						@Override
@@ -168,7 +205,7 @@ public class AceEditor {
 					webview.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 						@Override
 						public void handle(KeyEvent arg0) {
-							keyPressed = false;							
+							keyPressed = false;		
 						}
 					});
 					webview.addEventHandler(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
@@ -255,16 +292,25 @@ public class AceEditor {
 	}
 	
 	private void setContentInWebview(String contentType, String content) {
-		webview.getEngine().executeScript("resetDiv()");
+		getWebView().getEngine().executeScript("resetDiv()");
 		// set the content
 		Document document = webview.getEngine().getDocument();
 		Element editor = document.getElementById("editor");
+		while(editor == null) {
+			try {
+				Thread.sleep(10);
+			}
+			catch (InterruptedException e) {
+				break;
+			}
+			editor = document.getElementById("editor");
+		}
 		editor.setTextContent(content);
 		// initialize editor
-		webview.getEngine().executeScript("initEditor()");
+		getWebView().getEngine().executeScript("initEditor()");
 		String mode = modes.get(contentType);
 		if (mode != null) {
-			webview.getEngine().executeScript("editor.getSession().setMode('ace/mode/" + mode + "');");
+			getWebView().getEngine().executeScript("editor.getSession().setMode('ace/mode/" + mode + "');");
 		}
 	}
 }

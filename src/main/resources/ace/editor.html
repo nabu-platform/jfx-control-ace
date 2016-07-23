@@ -1,36 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-	<style type="text/css" media="screen">
-	#editor {
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-	}
-	</style>
-	</head>
-	<body>
-
-		<div id="editor"></div>
-	
-		<script src="ace.js" type="text/javascript" charset="utf-8"></script>
-		<script src="ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
-		<script src="ext-emmet.js" type="text/javascript" charset="utf-8"></script>
-		<script src="ext-whitespace.js" type="text/javascript" charset="utf-8"></script>
-		
-		<!-- supported modes -->
-		<script src="mode-javascript.js" type="text/javascript" charset="utf-8"></script>
-		<script src="mode-markdown.js" type="text/javascript" charset="utf-8"></script>
-		<script src="mode-html.js" type="text/javascript" charset="utf-8"></script>
-		<script src="mode-xml.js" type="text/javascript" charset="utf-8"></script>
-		<script src="mode-python.js" type="text/javascript" charset="utf-8"></script>
-		<script src="mode-css.js" type="text/javascript" charset="utf-8"></script>
-		<script src="mode-sql.js" type="text/javascript" charset="utf-8"></script>
-		
-		<!-- <script src="https://getfirebug.com/firebug-lite.js#startOpened"></script> -->
-		
+		<style type="text/css" media="screen">
+		#editor {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+		}
+		</style>
 		<script>
 			var editor;
 	
@@ -77,6 +56,32 @@
 			function pasteValue(value) {
 				editor.insert(value);
 			}
+			
+			function editorFocus() {
+				editor.focus();
+			}
 		</script>
+	</head>
+	<body>
+
+		<div id="editor"></div>
+	
+		<script src="ace.js" type="text/javascript" charset="utf-8"></script>
+		<script src="ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+		<script src="ext-emmet.js" type="text/javascript" charset="utf-8"></script>
+		<script src="ext-whitespace.js" type="text/javascript" charset="utf-8"></script>
+		
+		<!-- supported modes -->
+		<script src="mode-javascript.js" type="text/javascript" charset="utf-8"></script>
+		<script src="mode-markdown.js" type="text/javascript" charset="utf-8"></script>
+		<script src="mode-html.js" type="text/javascript" charset="utf-8"></script>
+		<script src="mode-xml.js" type="text/javascript" charset="utf-8"></script>
+		<script src="mode-python.js" type="text/javascript" charset="utf-8"></script>
+		<script src="mode-css.js" type="text/javascript" charset="utf-8"></script>
+		<script src="mode-sql.js" type="text/javascript" charset="utf-8"></script>
+		
+		<!-- <script src="https://getfirebug.com/firebug-lite.js#startOpened"></script> -->
+		
+		
 	</body>
 </html>
