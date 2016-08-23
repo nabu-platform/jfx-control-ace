@@ -152,7 +152,6 @@ public class AceEditor {
 
 					String externalForm = AceEditor.class.getResource("/ace/editor.html").toExternalForm();
 					System.out.println("Found editor: " + externalForm);
-					webview.getEngine().load(externalForm);
 
 					webview.getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
 						@Override
@@ -180,9 +179,14 @@ public class AceEditor {
 									setOption(key, options.get(key));
 								}
 							}
+							else {
+								getWebView().getEngine().executeScript("initEditor()");
+							}
 						}
 					});
 
+					webview.getEngine().load(externalForm);
+					
 					webview.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
 						@Override
 						public void handle(KeyEvent event) {
