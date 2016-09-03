@@ -12,6 +12,7 @@
 		</style>
 		<script>
 			var editor;
+			var langTools;
 	
 			function resetDiv() {
 				// recreate editor
@@ -24,7 +25,7 @@
 				document.body.appendChild(div);
 			}
 			function initEditor() {
-				ace.require("ace/ext/language_tools")
+				langTools = ace.require("ace/ext/language_tools")
 				editor = ace.edit("editor");
 				editor.setOptions({
 					enableBasicAutocompletion: true,
@@ -59,6 +60,60 @@
 			
 			function editorFocus() {
 				editor.focus();
+			}
+			
+			function setStartsWithCompletions(name, suggestions) {
+				if (langTools) {
+					var completer = {
+						getCompletions: function(editor, session, pos, prefix, callback) {
+							if (prefix.length === 0) {
+								callback(null, []);
+							}
+							else {
+								var matches = [];
+								for (var i = 0; i < suggestions.length; i++) {
+									if (suggestions[i].startsWith(prefix)) {
+										matches.push({
+											name: "" + suggestions[i],
+											value: "" + suggestions[i],
+											score: 1,
+											meta: name
+										});
+									}
+								}
+								callback(null, matches);
+							}
+						}
+					}
+					langTools.addCompleter(completer);
+				}
+			}
+			function setContainsCompletions(name, suggestions) {
+				if (langTools) {
+					var completer = {
+						getCompletions: function(editor, session, pos, prefix, callback) {
+							if (prefix.length <= 2) {
+								callback(null, []);
+							}
+							else {
+								var matches = [];
+								for (var i = 0; i < suggestions.length; i++) {
+									var suggestion = "" + suggestions[i];
+									if (suggestion.indexOf(prefix) >= 0) {
+										matches.push({
+											name: suggestion,
+											value: suggestion,
+											score: 1,
+											meta: name
+										});
+									}
+								}
+								callback(null, matches);
+							}
+						}
+					}
+					langTools.addCompleter(completer);
+				}
 			}
 		</script>
 	</head>

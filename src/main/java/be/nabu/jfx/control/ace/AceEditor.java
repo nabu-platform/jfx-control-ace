@@ -45,6 +45,8 @@ public class AceEditor {
 	private boolean keyPressed = false;
 	
 	private Map<String, Object> options = new HashMap<String, Object>();
+	private Map<String, List<String>> startsWith = new HashMap<String, List<String>>();
+	private Map<String, List<String>> contains = new HashMap<String, List<String>>();
 	
 	public AceEditor() {
 		setKeyCombination(COPY, new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN));
@@ -140,6 +142,26 @@ public class AceEditor {
 		}
 	}
 	
+	public void addStartsWith(String name, List<String> values) {
+		if (loaded) {
+			JSObject window = (JSObject) getWebView().getEngine().executeScript("window");
+			window.call("setStartsWithCompletions", name, values.toArray(new String[values.size()]));
+		}
+		else {
+			startsWith.put(name, values);
+		}
+	}
+
+	public void addContains(String name, List<String> values) {
+		if (loaded) {
+			JSObject window = (JSObject) getWebView().getEngine().executeScript("window");
+			window.call("setContainsCompletions", name, values.toArray(new String[values.size()]));
+		}
+		else {
+			contains.put(name, values);
+		}
+	}
+	
 	public WebView getWebView() {
 		if (this.webview == null) {
 			synchronized(this) {
@@ -181,6 +203,12 @@ public class AceEditor {
 							}
 							else {
 								getWebView().getEngine().executeScript("initEditor()");
+							}
+							for (String key : startsWith.keySet()) {
+								addStartsWith(key, startsWith.get(key));
+							}
+							for (String key : contains.keySet()) {
+								addContains(key, contains.get(key));
 							}
 						}
 					});
@@ -323,4 +351,5 @@ public class AceEditor {
 			getWebView().getEngine().executeScript("editor.getSession().setMode('ace/mode/" + mode + "');");
 		}
 	}
+	
 }
