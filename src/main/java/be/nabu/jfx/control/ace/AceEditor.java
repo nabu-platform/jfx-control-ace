@@ -216,23 +216,28 @@ public class AceEditor {
 						@Override
 						public void handle(KeyEvent event) {
 							if (keyPressed && event.getCharacter() != null && !event.getCharacter().isEmpty() && !event.isControlDown()) {
-								List<EventHandler<Event>> list = handlers.get(CHANGE);
-								if (list != null && !list.isEmpty()) {
-									for (EventHandler<Event> handler : list) {
-										handler.handle(event);
-										if (event.isConsumed()) {
-											break;
-										}
-									}
-								}
+								fireChanged(event);
 							}
 						}
+
 					});
 					return webview;
 				}
 			}
 		}
 		return webview;
+	}
+	
+	private void fireChanged(Event event) {
+		List<EventHandler<Event>> list = handlers.get(CHANGE);
+		if (list != null && !list.isEmpty()) {
+			for (EventHandler<Event> handler : list) {
+				handler.handle(event);
+				if (event.isConsumed()) {
+					break;
+				}
+			}
+		}
 	}
 	
 	public String getContent() {
@@ -285,6 +290,7 @@ public class AceEditor {
 				window.call("pasteValue", content);
 			}
 			event.consume();
+			editor.fireChanged(event);
 		}
 	}
 	
