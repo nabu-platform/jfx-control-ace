@@ -74,6 +74,9 @@ public class AceEditor {
 		setMode("text/sql", "sql");
 		setMode("text/x-template", "html");
 	}
+	public void setWrap(boolean wrapping) {
+		setOption("wrap", wrapping);
+	}
 	public void requestFocus() {
 		getWebView().requestFocus();
 		if (loaded) {
