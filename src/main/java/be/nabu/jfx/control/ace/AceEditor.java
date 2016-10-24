@@ -54,8 +54,8 @@ public class AceEditor {
 		setKeyCombination(SAVE, new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 		setKeyCombination(CLOSE_ALL, new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
 		setKeyCombination(CLOSE, new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
-		subscribe(COPY, new CopyHandler(this));
-		subscribe(PASTE, new PasteHandler(this));
+//		subscribe(COPY, new CopyHandler(this));
+//		subscribe(PASTE, new PasteHandler(this));
 		// make sure it doesn't bubble up to the parent
 		subscribe(SAVE, new ConsumeHandler());
 		subscribe(CLOSE, new ConsumeHandler());
