@@ -33,7 +33,8 @@ public class AceEditor {
 	public static final String SAVE = "save";
 	public static final String CLOSE = "close";
 	public static final String CLOSE_ALL = "closeAll";
-	public static final String CHANGE = "CHANGE";
+	public static final String CHANGE = "change";
+	public static final String FULL_SCREEN = "fullScreen";
 	
 	private WebView webview;
 	private boolean loaded;
@@ -54,6 +55,7 @@ public class AceEditor {
 		setKeyCombination(SAVE, new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 		setKeyCombination(CLOSE_ALL, new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
 		setKeyCombination(CLOSE, new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
+		setKeyCombination(FULL_SCREEN, new KeyCodeCombination(KeyCode.F11));
 //		subscribe(COPY, new CopyHandler(this));
 //		subscribe(PASTE, new PasteHandler(this));
 		// make sure it doesn't bubble up to the parent
