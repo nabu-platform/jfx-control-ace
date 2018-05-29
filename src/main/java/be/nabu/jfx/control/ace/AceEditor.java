@@ -75,6 +75,8 @@ public class AceEditor {
 		setMode("application/x-sql", "sql");
 		setMode("text/sql", "sql");
 		setMode("text/x-template", "html");
+		setMode("text/x-sass", "sass");
+		setMode("text/x-scss", "scss");
 	}
 	public void setWrap(boolean wrapping) {
 		setOption("wrap", wrapping);
