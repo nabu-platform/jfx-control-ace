@@ -9,6 +9,7 @@ import java.util.Map;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.input.Clipboard;
@@ -48,6 +49,19 @@ public class AceEditor {
 	private Map<String, Object> options = new HashMap<String, Object>();
 	private Map<String, List<String>> startsWith = new HashMap<String, List<String>>();
 	private Map<String, List<String>> contains = new HashMap<String, List<String>>();
+	
+	public void trigger(String name) {
+		Event event = new ActionEvent();
+		List<EventHandler<Event>> list = handlers.get(name);
+		if (list != null && !list.isEmpty()) {
+			for (EventHandler<Event> handler : list) {
+				handler.handle(event);
+				if (event.isConsumed()) {
+					break;
+				}
+			}
+		}
+	}
 	
 	public AceEditor() {
 		setKeyCombination(COPY, new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN));
@@ -134,9 +148,9 @@ public class AceEditor {
 	}
 	
 	private String getMatch(KeyEvent event) {
-		for (String String : this.keys.keySet()) {
-			if (this.keys.get(String).match(event)) {
-				return String;
+		for (String string : this.keys.keySet()) {
+			if (this.keys.get(string).match(event)) {
+				return string;
 			}
 		}
 		return null;
