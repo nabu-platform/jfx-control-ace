@@ -29,6 +29,24 @@ import org.w3c.dom.Element;
 //https://github.com/ajaxorg/ace-builds
 public class AceEditor {
 	
+	private static Boolean ENABLE_EMMET = Boolean.parseBoolean(System.getProperty("ace.emmet", "false"));
+	
+	public enum AceTheme {
+		DEFAULT(null),
+		TWILIGHT("ace/theme/twilight"),
+		MONOKAI_DARK("ace/theme/monokai-dark")
+		;
+		private String path;
+
+		private AceTheme(String path) {
+			this.path = path;
+		}
+
+		public String getPath() {
+			return path;
+		}
+	}
+	
 	public static final String COPY = "copy";
 	public static final String PASTE = "paste";
 	public static final String SAVE = "save";
@@ -49,6 +67,7 @@ public class AceEditor {
 	private Map<String, Object> options = new HashMap<String, Object>();
 	private Map<String, List<String>> startsWith = new HashMap<String, List<String>>();
 	private Map<String, List<String>> contains = new HashMap<String, List<String>>();
+	private AceTheme theme;
 	
 	public void trigger(String name) {
 		Event event = new ActionEvent();
@@ -91,6 +110,12 @@ public class AceEditor {
 		setMode("text/x-template", "html");
 		setMode("text/x-sass", "sass");
 		setMode("text/x-scss", "scss");
+		
+		setTheme(AceTheme.MONOKAI_DARK);
+		
+		if (ENABLE_EMMET) {
+			setEmmet(true);
+		}
 	}
 	public void setWrap(boolean wrapping) {
 		setOption("wrap", wrapping);
@@ -118,6 +143,12 @@ public class AceEditor {
 	}
 	public void setReadOnly(boolean readOnly) {
 		setOption("readOnly", readOnly);
+	}
+	public void setTheme(AceTheme theme) {
+		if (theme.getPath() != null) {
+			setOption("theme", '"' + theme.getPath() + '"');
+		}
+		this.theme = theme;
 	}
 	private void setOption(String key, Object value) {
 		options.put(key, value);
@@ -367,6 +398,10 @@ public class AceEditor {
 		editor.setTextContent(content);
 		// initialize editor
 		getWebView().getEngine().executeScript("initEditor()");
+		if (theme != null && theme.getPath() != null) {
+			System.out.println("Setting theme: " + theme.getPath());
+			getWebView().getEngine().executeScript("editor.setTheme('" + theme.getPath() + "');");
+		}
 		String mode = modes.get(contentType);
 		if (mode != null) {
 			getWebView().getEngine().executeScript("editor.getSession().setMode('ace/mode/" + mode + "');");
