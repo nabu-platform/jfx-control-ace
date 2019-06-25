@@ -1624,7 +1624,6 @@ function normalizeCommandKeys(callback, e, keyCode) {
     if (hashId & 8 && (keyCode >= 91 && keyCode <= 93)) {
         keyCode = -1;
     }
-    
     if (!hashId && keyCode === 13) {
         var location = "location" in e ? e.location : e.keyLocation;
         if (location === 3) {
@@ -2166,7 +2165,8 @@ var TextInput = function(parentNode, host) {
         var data = host.getCopyText();
         if (!data)
             return event.preventDefault(e);
-
+// CUSTOM
+java.copy(data);
         if (handleClipboardData(e, data)) {
             isCut ? host.onCut() : host.onCopy();
             event.preventDefault(e);
@@ -4111,6 +4111,12 @@ var KeyBinding = function(editor) {
         if (!success && hashId == -1) {
             toExecute = {command: "insertstring"};
             success = commands.exec("insertstring", this.$editor, keyString);
+        }
+        // CUSTOM
+        // for some reason in the latest jdks, the enters are not being handled correctly even though we get here with the correct keycode and everything...
+        if (!success && keyString == "return" && keyCode == 13) {
+        	toExecute = {command: "insertstring"};
+        	success = commands.exec("insertstring", this.$editor, "\n");
         }
         
         if (success)

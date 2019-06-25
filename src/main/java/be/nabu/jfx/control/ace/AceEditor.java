@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ForkJoinPool;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
@@ -111,7 +113,7 @@ public class AceEditor {
 		setMode("text/x-sass", "sass");
 		setMode("text/x-scss", "scss");
 		
-		setTheme(AceTheme.MONOKAI_DARK);
+//		setTheme(AceTheme.MONOKAI_DARK);
 		
 		if (ENABLE_EMMET) {
 			setEmmet(true);
@@ -237,10 +239,19 @@ public class AceEditor {
 //									contentType = null;
 //									content = null;
 //								}
+								
+//								try {
+//									JSObject window = (JSObject) webview.getEngine().executeScript("window");
+//								    window.setMember("java", new JavaBridge());
+//								    webview.getEngine().executeScript("console.log = function(message) { java.log(message); };");
+//								}
+//								catch (Exception e) {
+//									e.printStackTrace();
+//								}
 							}
 						}
 					});
-					
+
 					webview.getEngine().documentProperty().addListener(new ChangeListener<Document>() {
 						@Override
 						public void changed(ObservableValue<? extends Document> arg0, Document arg1, Document arg2) {
@@ -262,6 +273,9 @@ public class AceEditor {
 							for (String key : contains.keySet()) {
 								addContains(key, contains.get(key));
 							}
+							JSObject window = (JSObject) webview.getEngine().executeScript("window");
+						    window.setMember("java", bridge);
+						    webview.getEngine().executeScript("console.log = function(message) { java.log(message); };");
 						}
 					});
 
@@ -289,7 +303,7 @@ public class AceEditor {
 					webview.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 						@Override
 						public void handle(KeyEvent arg0) {
-							keyPressed = false;		
+							keyPressed = false;
 						}
 					});
 					webview.addEventHandler(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
@@ -344,11 +358,14 @@ public class AceEditor {
 		
 		@Override
 		public void handle(Event event) {
-			String selection = (String) editor.getWebView().getEngine().executeScript("copySelection()");
-			Clipboard clipboard = Clipboard.getSystemClipboard();
+			final String selection = (String) editor.getWebView().getEngine().executeScript("copySelection()");
+			// run with a delay, somewhere between 8_150 and 8_211 the copy functionality as it was before (without the copy handler at all) worked like a charm
+			// ace is also reporting the correct text for copying so presumable the webview itself is doing something off
+			System.out.println("copying selection: " + selection);
 			ClipboardContent clipboardContent = new ClipboardContent();
-			clipboardContent.putString(selection);
-			clipboard.setContent(clipboardContent);
+			clipboardContent.put(DataFormat.PLAIN_TEXT, selection);
+//						clipboardContent.putString(selection);
+			Clipboard.getSystemClipboard().setContent(clipboardContent);
 			event.consume();
 		}
 	}
@@ -407,5 +424,41 @@ public class AceEditor {
 			getWebView().getEngine().executeScript("editor.getSession().setMode('ace/mode/" + mode + "');");
 		}
 	}
+
+	private final JavaBridge bridge = new JavaBridge();
 	
+	public class JavaBridge {
+		public void log(String text) {
+			System.out.println(text);
+		}
+		// seriously nasty workaround for a bug (?) introduced somewhere between 8_150 and 8_212
+		// the copy was working splendidly before that but somewhere in that version range the copy broke
+		// javascript sees the correct value-to-be-copied, java also sees the correct value but somehow, someway the clipboard is empty when you copy a value from the ace editor
+		// fun fact: if you do ctrl+f in ace you get an inline find popup, the copy/paste still worked there without any problems
+		// it seems that the copy from the webview (or webkit) fails to detect the currently selected text and simply copies an empty string into the clipboard
+		// there seems to be no way to preventDefault or stopPropagation the copy event itself meaning the webview clipboard version always wins
+		// unless...we do a nasty timeout like this
+		public void copy(final String selection) {
+			ForkJoinPool.commonPool().submit(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							ClipboardContent clipboardContent = new ClipboardContent();
+							clipboardContent.put(DataFormat.PLAIN_TEXT, selection);
+							Clipboard.getSystemClipboard().setContent(clipboardContent);
+						}
+					});
+				}
+			});
+		}
+	}
+
 }
