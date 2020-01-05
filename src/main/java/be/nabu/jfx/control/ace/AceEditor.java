@@ -310,7 +310,13 @@ public class AceEditor {
 						@Override
 						public void handle(KeyEvent event) {
 							if (keyPressed && event.getCharacter() != null && !event.getCharacter().isEmpty() && !event.isControlDown()) {
-								fireChanged(event);
+								// run asynchronously, we want to capture the last added content as well
+								Platform.runLater(new Runnable() {
+									@Override
+									public void run() {
+										fireChanged(event);
+									}
+								});
 							}
 						}
 
