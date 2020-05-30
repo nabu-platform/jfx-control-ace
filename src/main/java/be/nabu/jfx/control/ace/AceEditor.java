@@ -340,6 +340,10 @@ public class AceEditor {
 		}
 	}
 	
+	public String getSelection() {
+		return (String) getWebView().getEngine().executeScript("copySelection()");
+	}
+	
 	public String getContent() {
 		return (String) webview.getEngine().executeScript("getValue()");
 	}

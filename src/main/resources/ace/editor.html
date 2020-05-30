@@ -40,6 +40,13 @@
 					tabSize: 4
 				});
 				editor.setTheme("ace/theme/monokai");
+				// we want to be able to use ctrl-enter to do stuff in java, we don't want regular enters to appear
+				editor.commands.addCommand({
+				    name: "Intercept Control-Enter",
+				    // do nothing
+				    exec: function() {},
+				    bindKey: {mac: "cmd-enter", win: "ctrl-enter"}
+				})
 			}
 			
 			function setOption(key, value) {
