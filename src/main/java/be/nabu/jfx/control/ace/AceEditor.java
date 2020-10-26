@@ -161,15 +161,15 @@ public class AceEditor {
 	public void setMode(String contentType, String mode) {
 		modes.put(contentType, mode);
 	}
-	public void setKeyCombination(String String, KeyCombination combination) {
-		if (String == CHANGE) {
+	public void setKeyCombination(String string, KeyCombination combination) {
+		if (CHANGE.equals(string)) {
 			throw new IllegalArgumentException("Can not set a key combination on change, it is the absence of a key combination");
 		}
 		if (combination == null) {
-			this.keys.remove(String);
+			this.keys.remove(string);
 		}
 		else {
-			this.keys.put(String, combination);
+			this.keys.put(string, combination);
 		}
 	}
 	

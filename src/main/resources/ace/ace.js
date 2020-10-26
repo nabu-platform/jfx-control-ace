@@ -4114,10 +4114,11 @@ var KeyBinding = function(editor) {
         }
         // CUSTOM
         // for some reason in the latest jdks, the enters are not being handled correctly even though we get here with the correct keycode and everything...
-        if (!success && keyString == "return" && keyCode == 13) {
-        	toExecute = {command: "insertstring"};
-        	success = commands.exec("insertstring", this.$editor, "\n");
-        }
+        // updated @2020-09-10: it is fixed again in later versions of 8 (testing with 1.8.0_261
+//        if (!success && keyString == "return" && keyCode == 13) {
+//        	toExecute = {command: "insertstring"};
+//        	success = commands.exec("insertstring", this.$editor, "\n");
+//        }
         
         if (success)
             this.$editor._signal("keyboardActivity", toExecute);
