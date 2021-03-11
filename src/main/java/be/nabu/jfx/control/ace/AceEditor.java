@@ -112,6 +112,7 @@ public class AceEditor {
 		setMode("text/x-template", "html");
 		setMode("text/x-sass", "sass");
 		setMode("text/x-scss", "scss");
+		setMode("text/nabu-page-template", "javascript");
 		
 //		setTheme(AceTheme.MONOKAI_DARK);
 		
