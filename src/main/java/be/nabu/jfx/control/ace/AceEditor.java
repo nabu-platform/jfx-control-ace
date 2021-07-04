@@ -103,7 +103,7 @@ public class AceEditor {
 		setMode("text/xml", "xml");
 		setMode("application/xml", "xml");
 		setMode("text/x-glue", "python");
-		setMode("text/x-eglue", "python");
+		setMode("text/x-eglue", "html");
 		setMode("text/x-gcss", "css");
 		setMode("text/css", "css");
 		setMode("text/x-markdown", "markdown");
