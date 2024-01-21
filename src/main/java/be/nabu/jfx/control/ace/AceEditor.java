@@ -120,6 +120,14 @@ public class AceEditor {
 			setEmmet(true);
 		}
 	}
+	public long getCaret() {
+		Object result = getWebView().getEngine().executeScript("getCaret()");
+		if (!(result instanceof Number)) {
+			result = Long.parseLong(result.toString());
+		}
+		return ((Number) result).longValue();
+	}
+	
 	public void setWrap(boolean wrapping) {
 		setOption("wrap", wrapping);
 	}

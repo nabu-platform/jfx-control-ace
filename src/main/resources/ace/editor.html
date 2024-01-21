@@ -49,6 +49,28 @@
 				})
 			}
 			
+			function getCaretRow() {
+				return editor.getCursorPosition().row;
+			}
+			function getCaretColumn() {
+				return editor.getCursorPosition().column;
+			}
+			
+			function getCaret() {
+				// has row and column, we want to translate to the string position
+				var point = editor.getCursorPosition();
+				// get all the lines...
+				var content = editor.getValue().split(/\n/g);
+				var counter = 0;
+				for (var i = 0; i < point.row; i++) {
+					// adding 1 for the linefeed we cut off
+					counter += content[i].length + 1;
+				}
+				// add the current offset for this row
+				counter += point.column;
+				return counter;
+			}
+			
 			function setOption(key, value) {
 				editor.setOption(key, value);
 			}
