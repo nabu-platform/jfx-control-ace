@@ -23,4 +23,12 @@
 			</plugin>
 		</plugins>
 	</build>
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
+		<dependency>
+		    <groupId>org.openjfx</groupId>
+		    <artifactId>javafx-controls</artifactId>
+		    <version>23</version>
+		</dependency>
+	</dependencies>
 </project>
